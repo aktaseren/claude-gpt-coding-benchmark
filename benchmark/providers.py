@@ -11,6 +11,11 @@ from .models import ModelResponse
 from .prompts import SYSTEM_INSTRUCTIONS
 
 
+LOCAL_CLI_OUTPUT_INSTRUCTIONS = """Before returning, validate the diff mentally:
+use correct unified-diff hunk counts, include a space prefix on unchanged lines,
+and emit no explanation or trailing prose. Keep the patch as small as possible."""
+
+
 class ProviderError(RuntimeError):
     """Raised when a model provider cannot produce a response."""
 
@@ -285,7 +290,11 @@ def _run_local_cli(
     timeout: int,
 ) -> subprocess.CompletedProcess[str]:
     safe_prompt = _redact_environment_values(
-        SYSTEM_INSTRUCTIONS + "\n\n" + prompt
+        SYSTEM_INSTRUCTIONS
+        + "\n\n"
+        + LOCAL_CLI_OUTPUT_INSTRUCTIONS
+        + "\n\n"
+        + prompt
     )
     try:
         completed = subprocess.run(

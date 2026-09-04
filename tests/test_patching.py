@@ -22,3 +22,19 @@ def test_extract_unified_diff_from_diff_fence():
 
 def test_extract_unified_diff_returns_none_for_explanation_only():
     assert extract_unified_diff("The code is already correct.") is None
+
+
+def test_extract_unified_diff_removes_a_trailing_closing_fence():
+    response = (
+        "--- a/example.py\n"
+        "+++ b/example.py\n"
+        "@@ -1 +1 @@\n"
+        "-old\n"
+        "+new\n"
+        "\x60\x60\x60\n"
+    )
+
+    patch = extract_unified_diff(response)
+
+    assert patch is not None
+    assert "\x60\x60\x60" not in patch

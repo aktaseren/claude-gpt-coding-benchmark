@@ -77,6 +77,7 @@ def run_model(
             workspace,
             max_files=task.max_files,
             max_file_bytes=task.max_file_bytes,
+            include_paths=task.include_paths,
         )
         response = provider.generate(build_prompt(task, snapshot))
         result.input_tokens = response.input_tokens
@@ -140,6 +141,7 @@ def compare_models(
         workspace,
         max_files=task.max_files,
         max_file_bytes=task.max_file_bytes,
+        include_paths=task.include_paths,
     )
     return [
         run_model(

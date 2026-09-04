@@ -118,6 +118,48 @@ def render_public_markdown(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def render_public_batch_markdown(payloads: list[dict[str, Any]]) -> str:
+    lines = [
+        "# Public multi-repository coding benchmark",
+        "",
+        "This comparison uses synthetic regression tasks on pinned public "
+        "repository snapshots. It intentionally excludes prompts, repository "
+        "snapshots, patches, test output, error details, and credentials.",
+        "",
+        "| Repository | Task | Provider | Model | Status | Patch | Tests | Time (s) |",
+        "|---|---|---|---|---|---|---|---:|",
+    ]
+    for payload in payloads:
+        task = payload["task"]
+        source = task.get("source") or {}
+        repository = str(source.get("repository", "local"))
+        repository_url = source.get("url")
+        repository_label = (
+            f"[{repository}]({repository_url})" if repository_url else repository
+        )
+        for result in payload.get("results", []):
+            lines.append(
+                "| {repository} | {task} | {provider} | {model} | {status} | {patch} | {tests} | {elapsed} |".format(
+                    repository=repository_label,
+                    task=task.get("title", ""),
+                    provider=result.get("provider", ""),
+                    model=result.get("model", ""),
+                    status=result.get("status", ""),
+                    patch="yes" if result.get("patch_applied") else "no",
+                    tests="yes" if result.get("tests_passed") else "no",
+                    elapsed=result.get("elapsed_seconds", ""),
+                )
+            )
+    lines.extend(
+        [
+            "",
+            "Each row is evidence for one task; these results are not a universal model ranking.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def write_markdown(payload: dict[str, Any], output: str | Path) -> None:
     path = Path(output)
     path.parent.mkdir(parents=True, exist_ok=True)

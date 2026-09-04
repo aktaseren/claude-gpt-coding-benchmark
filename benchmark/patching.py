@@ -16,18 +16,22 @@ FENCE_PATTERN = re.compile(
 )
 
 
+def _strip_closing_fence(value: str) -> str:
+    return re.sub(r"\n?\x60\x60\x60[ \t]*$", "", value).rstrip()
+
+
 def extract_unified_diff(response_text: str) -> str | None:
     for match in FENCE_PATTERN.finditer(response_text):
         candidate = match.group("patch").strip()
         if "diff --git " in candidate or (
             candidate.startswith("--- ") and "\n+++ " in candidate
         ):
-            return candidate + "\n"
+            return _strip_closing_fence(candidate) + "\n"
 
     for marker in ("diff --git ", "--- "):
         start = response_text.find(marker)
         if start >= 0:
-            candidate = response_text[start:].strip()
+            candidate = _strip_closing_fence(response_text[start:].strip())
             if "diff --git " in candidate or "\n+++ " in candidate:
                 return candidate + "\n"
     return None
@@ -51,6 +55,7 @@ def apply_unified_diff(root: str | Path, patch: str) -> None:
                 "git",
                 "apply",
                 "--check",
+                "--recount",
                 "--whitespace=nowarn",
                 str(patch_path),
             ],
@@ -67,6 +72,7 @@ def apply_unified_diff(root: str | Path, patch: str) -> None:
             [
                 "git",
                 "apply",
+                "--recount",
                 "--whitespace=nowarn",
                 str(patch_path),
             ],

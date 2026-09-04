@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title description" width="1000" height="604" viewBox="0 0 1000 604">
+<title id="title">codex-cli: gpt-5.6-luna vs claude-cli: sonnet coding benchmark</title>
+<desc id="description">Measured patch, test, timing, and token metrics for the selected models.</desc>
+<rect width="1000" height="604" rx="16" fill="#f8fafc"/>
+<text x="28" y="38" font-family="Arial, sans-serif" font-size="24px" fill="#172033">codex-cli: gpt-5.6-luna vs claude-cli: sonnet</text>
+<text x="28" y="67" font-family="Arial, sans-serif" font-size="15px" fill="#475569">Preserve the double-dash option prefix</text>
+<text x="28" y="88" font-family="Arial, sans-serif" font-size="13px" fill="#64748b">Recorded metrics only; this is not a universal model score.</text>
+<text x="28" y="121" font-family="Arial, sans-serif" font-size="15px" fill="#334155">Tests passed (yes/no)</text>
+<text x="250" y="148" font-family="Arial, sans-serif" font-size="12px" fill="#475569">codex-cli: gpt-5.6-luna</text>
+<rect x="460" y="135" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<rect x="460" y="135" width="390.0" height="14" rx="7" fill="#4f46e5"/>
+<text x="875" y="148" font-family="Arial, sans-serif" font-size="12px" fill="#172033">yes</text>
+<text x="250" y="173" font-family="Arial, sans-serif" font-size="12px" fill="#475569">claude-cli: sonnet</text>
+<rect x="460" y="160" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<rect x="460" y="160" width="4.0" height="14" rx="7" fill="#d97706"/>
+<text x="875" y="173" font-family="Arial, sans-serif" font-size="12px" fill="#172033">no</text>
+<text x="28" y="219" font-family="Arial, sans-serif" font-size="15px" fill="#334155">Patch applied (yes/no)</text>
+<text x="250" y="246" font-family="Arial, sans-serif" font-size="12px" fill="#475569">codex-cli: gpt-5.6-luna</text>
+<rect x="460" y="233" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<rect x="460" y="233" width="390.0" height="14" rx="7" fill="#4f46e5"/>
+<text x="875" y="246" font-family="Arial, sans-serif" font-size="12px" fill="#172033">yes</text>
+<text x="250" y="271" font-family="Arial, sans-serif" font-size="12px" fill="#475569">claude-cli: sonnet</text>
+<rect x="460" y="258" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<rect x="460" y="258" width="4.0" height="14" rx="7" fill="#d97706"/>
+<text x="875" y="271" font-family="Arial, sans-serif" font-size="12px" fill="#172033">no</text>
+<text x="28" y="317" font-family="Arial, sans-serif" font-size="15px" fill="#334155">Elapsed seconds</text>
+<text x="250" y="344" font-family="Arial, sans-serif" font-size="12px" fill="#475569">codex-cli: gpt-5.6-luna</text>
+<rect x="460" y="331" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<rect x="460" y="331" width="23.8" height="14" rx="7" fill="#4f46e5"/>
+<text x="875" y="344" font-family="Arial, sans-serif" font-size="12px" fill="#172033">10.98s</text>
+<text x="250" y="369" font-family="Arial, sans-serif" font-size="12px" fill="#475569">claude-cli: sonnet</text>
+<rect x="460" y="356" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<rect x="460" y="356" width="390.0" height="14" rx="7" fill="#d97706"/>
+<text x="875" y="369" font-family="Arial, sans-serif" font-size="12px" fill="#172033">180.11s</text>
+<text x="28" y="415" font-family="Arial, sans-serif" font-size="15px" fill="#334155">Input tokens</text>
+<text x="250" y="442" font-family="Arial, sans-serif" font-size="12px" fill="#475569">codex-cli: gpt-5.6-luna</text>
+<rect x="460" y="429" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<text x="875" y="442" font-family="Arial, sans-serif" font-size="12px" fill="#172033">n/a</text>
+<text x="250" y="467" font-family="Arial, sans-serif" font-size="12px" fill="#475569">claude-cli: sonnet</text>
+<rect x="460" y="454" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<text x="875" y="467" font-family="Arial, sans-serif" font-size="12px" fill="#172033">n/a</text>
+<text x="28" y="513" font-family="Arial, sans-serif" font-size="15px" fill="#334155">Output tokens</text>
+<text x="250" y="540" font-family="Arial, sans-serif" font-size="12px" fill="#475569">codex-cli: gpt-5.6-luna</text>
+<rect x="460" y="527" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<text x="875" y="540" font-family="Arial, sans-serif" font-size="12px" fill="#172033">n/a</text>
+<text x="250" y="565" font-family="Arial, sans-serif" font-size="12px" fill="#475569">claude-cli: sonnet</text>
+<rect x="460" y="552" width="390" height="14" rx="7" fill="#e2e8f0"/>
+<text x="875" y="565" font-family="Arial, sans-serif" font-size="12px" fill="#172033">n/a</text>
+</svg>

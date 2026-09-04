@@ -1,0 +1,14 @@
+{
+  "task_id": "pallets-click-option-parser-001",
+  "title": "Preserve the double-dash option prefix",
+  "prompt": "Fix Click's option parser in src/click/parser.py, specifically _split_opt. A long option such as --verbose must be split into the prefix -- and the value verbose. A short option such as -v must still be split into - and v, and an unprefixed value must retain an empty prefix. Keep the change focused and do not change tests.",
+  "test_command": "python -c \"import sys; sys.path.insert(0, 'src'); from click.parser import _split_opt; assert _split_opt('--verbose') == ('--', 'verbose'); assert _split_opt('-v') == ('-', 'v'); assert _split_opt('value') == ('', 'value')\"",
+  "include_paths": ["src/click/parser.py"],
+  "source": {
+    "kind": "synthetic_regression",
+    "repository": "pallets/click",
+    "url": "https://github.com/pallets/click",
+    "revision": "36baa15ff831b939a22bc527cd76ce653ef6f66d",
+    "mutation": "The double-dash branch temporarily returns only the first dash."
+  }
+}

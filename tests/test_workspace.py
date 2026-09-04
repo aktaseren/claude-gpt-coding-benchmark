@@ -13,3 +13,14 @@ def test_workspace_snapshot_excludes_secret_files(tmp_path):
     assert ".env" not in snapshot
     assert "do-not-send" not in snapshot
     assert "private.pem" not in snapshot
+
+
+def test_workspace_snapshot_can_select_explicit_paths(tmp_path):
+    (tmp_path / "app.py").write_text("print('app')", encoding="utf-8")
+    (tmp_path / "other.py").write_text("print('other')", encoding="utf-8")
+
+    snapshot = collect_workspace(tmp_path, include_paths=["app.py"])
+
+    assert "app.py" in snapshot
+    assert "app" in snapshot
+    assert "other.py" not in snapshot

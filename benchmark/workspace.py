@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
 
 
@@ -40,15 +41,28 @@ def collect_workspace(
     *,
     max_files: int = 80,
     max_file_bytes: int = 120_000,
+    include_paths: Iterable[str] | None = None,
 ) -> str:
     root = Path(root).resolve()
     if not root.is_dir():
         raise ValueError(f"Workspace is not a directory: {root}")
 
+    selected_paths = set()
+    for value in include_paths or ():
+        relative = Path(value)
+        if relative.is_absolute() or ".." in relative.parts:
+            raise ValueError(f"Included workspace path must be relative: {value}")
+        selected_paths.add(relative)
+
     sections: list[str] = []
     for path in sorted(root.rglob("*")):
         relative = path.relative_to(root)
         if not path.is_file():
+            continue
+        if selected_paths and not any(
+            relative == selected or selected in relative.parents
+            for selected in selected_paths
+        ):
             continue
         if any(part in IGNORED_DIRECTORIES for part in relative.parts):
             continue

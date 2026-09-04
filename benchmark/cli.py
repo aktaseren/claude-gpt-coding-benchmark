@@ -15,6 +15,7 @@ from .report import (
     build_payload,
     read_json,
     render_markdown,
+    render_public_batch_markdown,
     render_public_markdown,
     write_json,
 )
@@ -125,6 +126,13 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Exclude prompts, patches, test output, and error details",
     )
 
+    report_batch = commands.add_parser(
+        "report-batch",
+        help="Render several result JSON files as one sanitized Markdown report.",
+    )
+    report_batch.add_argument("results", nargs="+", help="Result JSON files")
+    report_batch.add_argument("--output", required=True)
+
     chart = commands.add_parser(
         "chart",
         help="Render measured benchmark results as an SVG chart.",
@@ -214,6 +222,16 @@ def _run(args: argparse.Namespace) -> int:
             print(f"Wrote Markdown report to {args.output}")
         else:
             print(markdown)
+        return 0
+
+    if args.command == "report-batch":
+        markdown = render_public_batch_markdown(
+            [read_json(path) for path in args.results]
+        )
+        path = Path(args.output)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(markdown, encoding="utf-8")
+        print(f"Wrote batch Markdown report to {args.output}")
         return 0
 
     raise ValueError("Unknown command")

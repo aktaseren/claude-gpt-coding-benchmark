@@ -1,0 +1,14 @@
+{
+  "task_id": "psf-requests-case-insensitive-dict-001",
+  "title": "Preserve case-insensitive header lookup",
+  "prompt": "Fix CaseInsensitiveDict in src/requests/structures.py, specifically __setitem__, so keys are compared case-insensitively while the latest spelling is preserved during iteration. Assign Content-Type and then content-type: the mapping must contain one item, all case variants must retrieve the latest value, and iteration must expose content-type. Keep the change focused and do not change tests.",
+  "test_command": "python -c \"import sys; sys.path.insert(0, 'src'); from requests.structures import CaseInsensitiveDict; headers = CaseInsensitiveDict(); headers['Content-Type'] = 'old'; headers['content-type'] = 'new'; assert len(headers) == 1; assert headers['CONTENT-TYPE'] == 'new'; assert list(headers) == ['content-type']\"",
+  "include_paths": ["src/requests/structures.py"],
+  "source": {
+    "kind": "synthetic_regression",
+    "repository": "psf/requests",
+    "url": "https://github.com/psf/requests",
+    "revision": "dae7ef63b4df6eded86637f251fc4e3a06c3b479",
+    "mutation": "CaseInsensitiveDict temporarily stores keys without lowercasing them."
+  }
+}

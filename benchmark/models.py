@@ -19,6 +19,7 @@ class BenchmarkTask:
     source: dict[str, Any] = field(default_factory=dict)
     max_files: int = 80
     max_file_bytes: int = 120_000
+    include_paths: tuple[str, ...] = ()
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "BenchmarkTask":
@@ -38,6 +39,7 @@ class BenchmarkTask:
             source=dict(value.get("source") or {}),
             max_files=int(value.get("max_files", 80)),
             max_file_bytes=int(value.get("max_file_bytes", 120_000)),
+            include_paths=tuple(str(path) for path in value.get("include_paths", ())),
         )
 
     def to_dict(self) -> dict[str, Any]:

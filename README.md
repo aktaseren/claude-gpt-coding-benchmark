@@ -88,6 +88,42 @@ For local authenticated CLIs, use:
       --claude-model sonnet \
       --output results/local-cli-demo.json
 
+## Two popular public repositories
+
+The repository also includes two focused synthetic regression tasks on pinned
+public snapshots: Click's long-option parser and Requests' case-insensitive
+header mapping. The task snapshots include only the relevant source file, and
+the hidden assertions are supplied through the test command.
+
+![Click comparison](docs/popular-click.svg)
+
+![Requests comparison](docs/popular-requests.svg)
+
+The sanitized combined result is in
+[docs/popular-repo-comparison.md](docs/popular-repo-comparison.md). To rerun
+the cases locally:
+
+    coding-benchmark compare-local examples/popular_tasks/click-option-parser.json \
+      --workspace /tmp/benchmark-popular-repos/click \
+      --codex-model gpt-5.6-luna \
+      --claude-model sonnet \
+      --output results/click-local.json
+
+    coding-benchmark compare-local examples/popular_tasks/requests-case-insensitive-dict.json \
+      --workspace /tmp/benchmark-popular-repos/requests \
+      --codex-model gpt-5.6-luna \
+      --claude-model sonnet \
+      --output results/requests-local.json
+
+    coding-benchmark chart results/click-local.json \
+      --output docs/popular-click.svg
+
+    coding-benchmark chart results/requests-local.json \
+      --output docs/popular-requests.svg
+
+    coding-benchmark report-batch results/click-local.json results/requests-local.json \
+      --output docs/popular-repo-comparison.md
+
 ## Task manifest
 
 A task is a JSON document:
