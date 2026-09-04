@@ -26,28 +26,28 @@
 <text x="28" y="317" font-family="Arial, sans-serif" font-size="15px" fill="#334155">Elapsed seconds</text>
 <text x="250" y="344" font-family="Arial, sans-serif" font-size="12px" fill="#475569">codex-cli: gpt-5.6-luna</text>
 <rect x="460" y="331" width="390" height="14" rx="7" fill="#e2e8f0"/>
-<rect x="460" y="331" width="330.8" height="14" rx="7" fill="#4f46e5"/>
-<text x="875" y="344" font-family="Arial, sans-serif" font-size="12px" fill="#172033">9.60s</text>
+<rect x="460" y="331" width="173.0" height="14" rx="7" fill="#4f46e5"/>
+<text x="875" y="344" font-family="Arial, sans-serif" font-size="12px" fill="#172033">5.04s</text>
 <text x="250" y="369" font-family="Arial, sans-serif" font-size="12px" fill="#475569">claude-cli: sonnet</text>
 <rect x="460" y="356" width="390" height="14" rx="7" fill="#e2e8f0"/>
 <rect x="460" y="356" width="390.0" height="14" rx="7" fill="#d97706"/>
-<text x="875" y="369" font-family="Arial, sans-serif" font-size="12px" fill="#172033">11.31s</text>
+<text x="875" y="369" font-family="Arial, sans-serif" font-size="12px" fill="#172033">11.38s</text>
 <text x="28" y="415" font-family="Arial, sans-serif" font-size="15px" fill="#334155">Input tokens</text>
 <text x="250" y="442" font-family="Arial, sans-serif" font-size="12px" fill="#475569">codex-cli: gpt-5.6-luna</text>
 <rect x="460" y="429" width="390" height="14" rx="7" fill="#e2e8f0"/>
 <rect x="460" y="429" width="390.0" height="14" rx="7" fill="#4f46e5"/>
-<text x="875" y="442" font-family="Arial, sans-serif" font-size="12px" fill="#172033">42,896</text>
+<text x="875" y="442" font-family="Arial, sans-serif" font-size="12px" fill="#172033">10,429</text>
 <text x="250" y="467" font-family="Arial, sans-serif" font-size="12px" fill="#475569">claude-cli: sonnet</text>
 <rect x="460" y="454" width="390" height="14" rx="7" fill="#e2e8f0"/>
-<rect x="460" y="454" width="4.0" height="14" rx="7" fill="#d97706"/>
-<text x="875" y="467" font-family="Arial, sans-serif" font-size="12px" fill="#172033">2</text>
+<rect x="460" y="454" width="221.1" height="14" rx="7" fill="#d97706"/>
+<text x="875" y="467" font-family="Arial, sans-serif" font-size="12px" fill="#172033">5,912</text>
 <text x="28" y="513" font-family="Arial, sans-serif" font-size="15px" fill="#334155">Output tokens</text>
 <text x="250" y="540" font-family="Arial, sans-serif" font-size="12px" fill="#475569">codex-cli: gpt-5.6-luna</text>
 <rect x="460" y="527" width="390" height="14" rx="7" fill="#e2e8f0"/>
-<rect x="460" y="527" width="332.0" height="14" rx="7" fill="#4f46e5"/>
-<text x="875" y="540" font-family="Arial, sans-serif" font-size="12px" fill="#172033">595</text>
+<rect x="460" y="527" width="187.2" height="14" rx="7" fill="#4f46e5"/>
+<text x="875" y="540" font-family="Arial, sans-serif" font-size="12px" fill="#172033">311</text>
 <text x="250" y="565" font-family="Arial, sans-serif" font-size="12px" fill="#475569">claude-cli: sonnet</text>
 <rect x="460" y="552" width="390" height="14" rx="7" fill="#e2e8f0"/>
 <rect x="460" y="552" width="390.0" height="14" rx="7" fill="#d97706"/>
-<text x="875" y="565" font-family="Arial, sans-serif" font-size="12px" fill="#172033">699</text>
+<text x="875" y="565" font-family="Arial, sans-serif" font-size="12px" fill="#172033">648</text>
 </svg>

@@ -47,12 +47,29 @@ def test_codex_cli_provider_uses_ephemeral_read_only_mode(monkeypatch):
 def test_claude_cli_provider_extracts_json_result(monkeypatch):
     def fake_run(command, prompt, *, cwd, timeout):
         assert command[:4] == ["claude", "--print", "--model", "sonnet"]
-        payload = {"result": "--- a/app.py\n+++ b/app.py\n", "usage": {"input_tokens": 4, "output_tokens": 8}}
+        payload = {
+            "result": "--- a/app.py\n+++ b/app.py\n",
+            "usage": {"input_tokens": 2, "output_tokens": 8},
+            "modelUsage": {
+                "claude-sonnet-4-6": {
+                    "inputTokens": 4,
+                    "cacheReadInputTokens": 10,
+                    "cacheCreationInputTokens": 20,
+                    "outputTokens": 8,
+                    "canonicalModel": "claude-sonnet-4-6",
+                },
+                "claude-haiku-4-5": {
+                    "inputTokens": 1000,
+                    "outputTokens": 1000,
+                    "canonicalModel": "claude-haiku-4-5",
+                },
+            },
+        }
         return subprocess.CompletedProcess(command, 0, json.dumps(payload), "")
 
     monkeypatch.setattr(providers, "_run_local_cli", fake_run)
     response = providers.ClaudeCLIProvider("sonnet").generate("task")
 
     assert response.text.startswith("--- a/app.py")
-    assert response.input_tokens == 4
+    assert response.input_tokens == 34
     assert response.output_tokens == 8

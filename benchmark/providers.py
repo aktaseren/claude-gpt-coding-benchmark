@@ -189,6 +189,60 @@ def _codex_usage(output: str) -> tuple[int | None, int | None]:
     return input_tokens, output_tokens
 
 
+def _claude_usage(
+    payload: dict[str, Any], requested_model: str
+) -> tuple[int | None, int | None]:
+    model_usage = payload.get("modelUsage") or {}
+    requested = requested_model.lower()
+    matching_usage = []
+    for name, usage in model_usage.items():
+        label = str(name).lower()
+        canonical = str((usage or {}).get("canonicalModel", "")).lower()
+        if requested in {"sonnet", "claude-sonnet"}:
+            matches = "sonnet" in label or "sonnet" in canonical
+        else:
+            matches = requested in label or requested in canonical
+        if matches:
+            matching_usage.append(usage)
+
+    usage_entries = matching_usage or list(model_usage.values())
+    if usage_entries:
+        input_tokens = 0
+        output_tokens = 0
+        saw_input = False
+        saw_output = False
+        for usage in usage_entries:
+            uncached = _usage_value(usage, "inputTokens")
+            cache_read = _usage_value(usage, "cacheReadInputTokens")
+            cache_created = _usage_value(usage, "cacheCreationInputTokens")
+            for value in (uncached, cache_read, cache_created):
+                if value is not None:
+                    input_tokens += value
+                    saw_input = True
+            output = _usage_value(usage, "outputTokens")
+            if output is not None:
+                output_tokens += output
+                saw_output = True
+        if saw_input or saw_output:
+            return (
+                input_tokens if saw_input else None,
+                output_tokens if saw_output else None,
+            )
+
+    usage = payload.get("usage") or {}
+    input_values = (
+        _usage_value(usage, "input_tokens"),
+        _usage_value(usage, "cache_read_input_tokens"),
+        _usage_value(usage, "cache_creation_input_tokens"),
+    )
+    input_tokens = sum(value for value in input_values if value is not None)
+    output_tokens = _usage_value(usage, "output_tokens")
+    return (
+        input_tokens if any(value is not None for value in input_values) else None,
+        output_tokens,
+    )
+
+
 class CodexCLIProvider:
     provider = "codex-cli"
 
@@ -287,13 +341,7 @@ class ClaudeCLIProvider:
             payload = None
         if isinstance(payload, dict):
             response_text = str(payload.get("result") or payload.get("text") or "")
-            usage = payload.get("usage") or {}
-            input_tokens = _usage_value(usage, "input_tokens")
-            if input_tokens is None:
-                input_tokens = _usage_value(usage, "inputTokens")
-            output_tokens = _usage_value(usage, "output_tokens")
-            if output_tokens is None:
-                output_tokens = _usage_value(usage, "outputTokens")
+            input_tokens, output_tokens = _claude_usage(payload, self.model)
 
         if not response_text.strip():
             raise ProviderError("Claude CLI returned no final message")

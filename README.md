@@ -73,12 +73,16 @@ This image is generated from an actual result JSON file. It deliberately shows
 recorded patch, test, timing, and token metrics instead of combining different
 units into an unsupported universal score.
 
-![GPT-5.6 Luna vs Claude coding benchmark](docs/benchmark-results.svg?v=cf675ca)
+![GPT-5.6 Luna vs Claude coding benchmark](docs/benchmark-results.svg?v=token-usage-fix)
 
 The current public run uses the repository's calculator demo task. Both local
 CLIs passed the same test; the sanitized summary is available in
 [docs/local-cli-comparison.md](docs/local-cli-comparison.md). Raw result JSON,
 prompts, patches, test output, and credentials remain local and ignored.
+
+Claude input-token totals include uncached, cache-read, and cache-created input
+reported for the selected model. Claude Code's top-level `input_tokens` field
+only contains the uncached portion.
 
 For local authenticated CLIs, use:
 
@@ -95,9 +99,9 @@ public snapshots: Click's long-option parser and Requests' case-insensitive
 header mapping. The task snapshots include only the relevant source file, and
 the hidden assertions are supplied through the test command.
 
-![Click comparison](docs/popular-click.svg?v=cf675ca)
+![Click comparison](docs/popular-click.svg?v=token-usage-fix)
 
-![Requests comparison](docs/popular-requests.svg?v=cf675ca)
+![Requests comparison](docs/popular-requests.svg?v=token-usage-fix)
 
 The sanitized combined result is in
 [docs/popular-repo-comparison.md](docs/popular-repo-comparison.md). To rerun

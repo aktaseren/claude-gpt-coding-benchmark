@@ -87,6 +87,8 @@ def render_public_markdown(payload: dict[str, Any]) -> str:
         "",
         "This summary intentionally excludes prompts, repository snapshots, "
         "patches, test output, and credentials.",
+        "Claude input-token values include uncached, cache-read, and cache-created "
+        "tokens reported for the selected model.",
         "",
         "| Provider | Model | Status | Patch applied | Tests passed | Time (s) | Input tokens | Output tokens |",
         "|---|---|---|---|---|---:|---:|---:|",
@@ -124,7 +126,9 @@ def render_public_batch_markdown(payloads: list[dict[str, Any]]) -> str:
         "",
         "This comparison uses synthetic regression tasks on pinned public "
         "repository snapshots. It intentionally excludes prompts, repository "
-        "snapshots, patches, test output, error details, and credentials.",
+        "snapshots, patches, test output, error details, and credentials. Claude "
+        "input-token values include uncached, cache-read, and cache-created "
+        "tokens reported for the selected model.",
         "",
         "| Repository | Task | Provider | Model | Status | Patch | Tests | Time (s) | Input tokens | Output tokens |",
         "|---|---|---|---|---|---|---|---:|---:|---:|",
