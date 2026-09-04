@@ -73,7 +73,7 @@ This image is generated from an actual result JSON file. It deliberately shows
 recorded patch, test, timing, and token metrics instead of combining different
 units into an unsupported universal score.
 
-![GPT-5.6 Luna vs Claude coding benchmark](docs/benchmark-results.svg)
+![GPT-5.6 Luna vs Claude coding benchmark](docs/benchmark-results.svg?v=cf675ca)
 
 The current public run uses the repository's calculator demo task. Both local
 CLIs passed the same test; the sanitized summary is available in
@@ -95,9 +95,9 @@ public snapshots: Click's long-option parser and Requests' case-insensitive
 header mapping. The task snapshots include only the relevant source file, and
 the hidden assertions are supplied through the test command.
 
-![Click comparison](docs/popular-click.svg)
+![Click comparison](docs/popular-click.svg?v=cf675ca)
 
-![Requests comparison](docs/popular-requests.svg)
+![Requests comparison](docs/popular-requests.svg?v=cf675ca)
 
 The sanitized combined result is in
 [docs/popular-repo-comparison.md](docs/popular-repo-comparison.md). To rerun
