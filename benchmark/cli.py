@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Sequence
 
+from .chart import write_svg
 from .github import GitHubClient
 from .models import BenchmarkTask
 from .providers import make_provider
@@ -67,8 +69,22 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     compare.add_argument("task", help="Path to a task JSON manifest")
     compare.add_argument("--workspace", required=True)
-    compare.add_argument("--openai-model", required=True)
-    compare.add_argument("--anthropic-model", required=True)
+    compare.add_argument(
+        "--openai-model",
+        default=os.getenv("OPENAI_MODEL") or "gpt-5.6-luna",
+        help="OpenAI model ID (default: gpt-5.6-luna)",
+    )
+    compare.add_argument(
+        "--anthropic-model",
+        default=os.getenv("ANTHROPIC_MODEL"),
+        help="Claude model ID, or set ANTHROPIC_MODEL",
+    )
+    compare.add_argument(
+        "--openai-reasoning-effort",
+        choices=("none", "low", "medium", "high", "xhigh", "max"),
+        default=os.getenv("OPENAI_REASONING_EFFORT") or "medium",
+        help="Reasoning effort sent to GPT-5.6 Luna (default: medium)",
+    )
     compare.add_argument("--timeout", type=int, default=300)
     compare.add_argument("--output", required=True)
 
@@ -78,6 +94,13 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     report.add_argument("result", help="Path to a result JSON file")
     report.add_argument("--output")
+
+    chart = commands.add_parser(
+        "chart",
+        help="Render measured benchmark results as an SVG chart.",
+    )
+    chart.add_argument("result", help="Path to a result JSON file")
+    chart.add_argument("--output", required=True)
     return parser
 
 
@@ -107,9 +130,17 @@ def _run(args: argparse.Namespace) -> int:
         return 0
 
     if args.command == "compare":
+        if not args.anthropic_model:
+            raise ValueError(
+                "Set ANTHROPIC_MODEL or pass --anthropic-model with the exact Claude model ID"
+            )
         task = _read_task(args.task)
         providers = [
-            make_provider("openai", args.openai_model),
+            make_provider(
+                "openai",
+                args.openai_model,
+                reasoning_effort=args.openai_reasoning_effort,
+            ),
             make_provider("anthropic", args.anthropic_model),
         ]
         results = compare_models(
@@ -120,6 +151,11 @@ def _run(args: argparse.Namespace) -> int:
         )
         write_json(build_payload(task, results), args.output)
         print(f"Wrote comparison results to {args.output}")
+        return 0
+
+    if args.command == "chart":
+        write_svg(read_json(args.result), args.output)
+        print(f"Wrote SVG chart to {args.output}")
         return 0
 
     if args.command == "report":

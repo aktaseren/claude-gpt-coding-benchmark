@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title description" width="1000" height="300" viewBox="0 0 1000 300">
+  <title id="title">GPT-5.6 Luna vs Claude benchmark pending</title>
+  <desc id="description">No live benchmark results have been recorded yet.</desc>
+  <rect width="1000" height="300" rx="16" fill="#f8fafc"/>
+  <text x="42" y="58" font-family="Arial, sans-serif" font-size="26px" fill="#172033">GPT-5.6 Luna vs Claude</text>
+  <text x="42" y="100" font-family="Arial, sans-serif" font-size="16px" fill="#475569">Measured coding-task comparison</text>
+  <text x="42" y="166" font-family="Arial, sans-serif" font-size="23px" fill="#4f46e5">Live benchmark pending</text>
+  <text x="42" y="208" font-family="Arial, sans-serif" font-size="15px" fill="#475569">Run compare, then chart, to populate this image with measured results.</text>
+</svg>

@@ -44,9 +44,15 @@ def _usage_value(usage: Any, name: str) -> int | None:
 class OpenAIProvider:
     provider = "openai"
 
-    def __init__(self, model: str, api_key: str | None = None) -> None:
+    def __init__(
+        self,
+        model: str,
+        api_key: str | None = None,
+        reasoning_effort: str | None = None,
+    ) -> None:
         self.model = model
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.reasoning_effort = reasoning_effort
 
     def generate(self, prompt: str) -> ModelResponse:
         if not self.api_key:
@@ -60,12 +66,15 @@ class OpenAIProvider:
 
         try:
             client = OpenAI(api_key=self.api_key)
-            response = client.responses.create(
-                model=self.model,
-                instructions=SYSTEM_INSTRUCTIONS,
-                input=prompt,
-                store=False,
-            )
+            request: dict[str, Any] = {
+                "model": self.model,
+                "instructions": SYSTEM_INSTRUCTIONS,
+                "input": prompt,
+                "store": False,
+            }
+            if self.reasoning_effort:
+                request["reasoning"] = {"effort": self.reasoning_effort}
+            response = client.responses.create(**request)
         except Exception as exc:
             raise ProviderError(f"OpenAI request failed: {exc}") from exc
 
@@ -120,10 +129,15 @@ class AnthropicProvider:
         )
 
 
-def make_provider(provider: str, model: str) -> ModelProvider:
+def make_provider(
+    provider: str,
+    model: str,
+    *,
+    reasoning_effort: str | None = None,
+) -> ModelProvider:
     provider = provider.lower()
     if provider == "openai":
-        return OpenAIProvider(model)
+        return OpenAIProvider(model, reasoning_effort=reasoning_effort)
     if provider == "anthropic":
         return AnthropicProvider(model)
     raise ValueError(f"Unsupported provider: {provider}")

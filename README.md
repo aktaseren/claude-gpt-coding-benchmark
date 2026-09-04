@@ -45,8 +45,8 @@ Run both providers against the same local checkout:
 
     coding-benchmark compare tasks/presidio-issue-1.json \
       --workspace /path/to/repository \
-      --openai-model YOUR_OPENAI_MODEL_ID \
-      --anthropic-model YOUR_CLAUDE_MODEL_ID \
+      --openai-model gpt-5.6-luna \
+      --anthropic-model YOUR_CLAUDE_BALANCED_MODEL_ID \
       --output results/presidio-issue-1.json
 
 Render a human-readable report:
@@ -54,9 +54,26 @@ Render a human-readable report:
     coding-benchmark report results/presidio-issue-1.json \
       --output results/presidio-issue-1.md
 
-Model IDs are passed explicitly because availability changes by account and
-provider. For OpenAI, use a current model ID from the official model catalog.
-The runner uses the OpenAI Responses API and the Anthropic Messages API.
+Generate the README chart from the measured JSON result:
+
+    coding-benchmark chart results/presidio-issue-1.json \
+      --output docs/benchmark-results.svg
+
+The OpenAI model defaults to gpt-5.6-luna and its reasoning effort defaults to
+medium. The Claude model remains configurable because the exact current model
+ID depends on the Anthropic account. For this project, a current Claude
+Sonnet-tier model is the intended practical peer for Luna's cost-sensitive
+coding workload; that is a workload-matching choice, not an official model
+equivalence claim. The runner uses the OpenAI Responses API and the Anthropic
+Messages API.
+
+## Latest comparison chart
+
+This image is generated from an actual result JSON file. It deliberately shows
+recorded patch, test, timing, and token metrics instead of combining different
+units into an unsupported universal score.
+
+![GPT-5.6 Luna vs Claude coding benchmark](docs/benchmark-results.svg)
 
 ## Task manifest
 
