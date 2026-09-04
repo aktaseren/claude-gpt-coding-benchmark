@@ -1,0 +1,10 @@
+{
+  "task_id": "demo-calculator-001",
+  "title": "Fix calculator addition",
+  "prompt": "The add function returns the wrong result. Make it return the sum of left and right without changing the test.",
+  "test_command": "python -m pytest examples/demo_repo/test_calculator.py -q",
+  "source": {
+    "kind": "local_example",
+    "path": "examples/demo_repo"
+  }
+}
