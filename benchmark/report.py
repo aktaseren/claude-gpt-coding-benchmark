@@ -126,8 +126,8 @@ def render_public_batch_markdown(payloads: list[dict[str, Any]]) -> str:
         "repository snapshots. It intentionally excludes prompts, repository "
         "snapshots, patches, test output, error details, and credentials.",
         "",
-        "| Repository | Task | Provider | Model | Status | Patch | Tests | Time (s) |",
-        "|---|---|---|---|---|---|---|---:|",
+        "| Repository | Task | Provider | Model | Status | Patch | Tests | Time (s) | Input tokens | Output tokens |",
+        "|---|---|---|---|---|---|---|---:|---:|---:|",
     ]
     for payload in payloads:
         task = payload["task"]
@@ -139,7 +139,7 @@ def render_public_batch_markdown(payloads: list[dict[str, Any]]) -> str:
         )
         for result in payload.get("results", []):
             lines.append(
-                "| {repository} | {task} | {provider} | {model} | {status} | {patch} | {tests} | {elapsed} |".format(
+                "| {repository} | {task} | {provider} | {model} | {status} | {patch} | {tests} | {elapsed} | {input} | {output} |".format(
                     repository=repository_label,
                     task=task.get("title", ""),
                     provider=result.get("provider", ""),
@@ -148,6 +148,12 @@ def render_public_batch_markdown(payloads: list[dict[str, Any]]) -> str:
                     patch="yes" if result.get("patch_applied") else "no",
                     tests="yes" if result.get("tests_passed") else "no",
                     elapsed=result.get("elapsed_seconds", ""),
+                    input=result.get("input_tokens")
+                    if result.get("input_tokens") is not None
+                    else "n/a",
+                    output=result.get("output_tokens")
+                    if result.get("output_tokens") is not None
+                    else "n/a",
                 )
             )
     lines.extend(

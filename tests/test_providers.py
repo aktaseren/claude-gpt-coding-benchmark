@@ -28,12 +28,20 @@ def test_codex_cli_provider_uses_ephemeral_read_only_mode(monkeypatch):
         assert "--ephemeral" in command
         output_path = Path(command[command.index("--output-last-message") + 1])
         output_path.write_text("--- a/app.py\n+++ b/app.py\n", encoding="utf-8")
-        return subprocess.CompletedProcess(command, 0, "", "")
+        stdout = json.dumps(
+            {
+                "type": "turn.completed",
+                "usage": {"input_tokens": 12, "output_tokens": 8},
+            }
+        )
+        return subprocess.CompletedProcess(command, 0, stdout, "")
 
     monkeypatch.setattr(providers, "_run_local_cli", fake_run)
     response = providers.CodexCLIProvider("gpt-5.6-luna").generate("task")
 
     assert response.text.startswith("--- a/app.py")
+    assert response.input_tokens == 12
+    assert response.output_tokens == 8
 
 
 def test_claude_cli_provider_extracts_json_result(monkeypatch):

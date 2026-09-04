@@ -173,6 +173,22 @@ def _redact_environment_values(text: str) -> str:
     return redacted
 
 
+def _codex_usage(output: str) -> tuple[int | None, int | None]:
+    input_tokens = None
+    output_tokens = None
+    for line in output.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") != "turn.completed":
+            continue
+        usage = event.get("usage") or {}
+        input_tokens = _usage_value(usage, "input_tokens")
+        output_tokens = _usage_value(usage, "output_tokens")
+    return input_tokens, output_tokens
+
+
 class CodexCLIProvider:
     provider = "codex-cli"
 
@@ -201,6 +217,7 @@ class CodexCLIProvider:
                 "--ignore-user-config",
                 "--color",
                 "never",
+                "--json",
                 "--output-last-message",
                 str(output_path),
                 "-",
@@ -217,7 +234,12 @@ class CodexCLIProvider:
                 response_text = completed.stdout
             if not response_text.strip():
                 raise ProviderError("Codex CLI returned no final message")
-            return ModelResponse(text=_redact_environment_values(response_text))
+            input_tokens, output_tokens = _codex_usage(completed.stdout)
+            return ModelResponse(
+                text=_redact_environment_values(response_text),
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+            )
 
 
 class ClaudeCLIProvider:
