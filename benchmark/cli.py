@@ -10,8 +10,14 @@ from typing import Sequence
 from .chart import write_svg
 from .github import GitHubClient
 from .models import BenchmarkTask
-from .providers import make_provider
-from .report import build_payload, read_json, render_markdown, write_json
+from .providers import make_cli_provider, make_provider
+from .report import (
+    build_payload,
+    read_json,
+    render_markdown,
+    render_public_markdown,
+    write_json,
+)
 from .runner import compare_models
 
 
@@ -88,12 +94,36 @@ def _build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--timeout", type=int, default=300)
     compare.add_argument("--output", required=True)
 
+    compare_local = commands.add_parser(
+        "compare-local",
+        help="Compare local Codex and Claude CLIs without passing API keys.",
+    )
+    compare_local.add_argument("task", help="Path to a task JSON manifest")
+    compare_local.add_argument("--workspace", required=True)
+    compare_local.add_argument(
+        "--codex-model",
+        default=os.getenv("CODEX_MODEL") or "gpt-5.6-luna",
+        help="Model passed to codex exec (default: gpt-5.6-luna)",
+    )
+    compare_local.add_argument(
+        "--claude-model",
+        default=os.getenv("CLAUDE_MODEL") or "sonnet",
+        help="Model or alias passed to Claude Code (default: sonnet)",
+    )
+    compare_local.add_argument("--timeout", type=int, default=300)
+    compare_local.add_argument("--output", required=True)
+
     report = commands.add_parser(
         "report",
         help="Render a JSON benchmark result as Markdown.",
     )
     report.add_argument("result", help="Path to a result JSON file")
     report.add_argument("--output")
+    report.add_argument(
+        "--public",
+        action="store_true",
+        help="Exclude prompts, patches, test output, and error details",
+    )
 
     chart = commands.add_parser(
         "chart",
@@ -153,13 +183,30 @@ def _run(args: argparse.Namespace) -> int:
         print(f"Wrote comparison results to {args.output}")
         return 0
 
+    if args.command == "compare-local":
+        task = _read_task(args.task)
+        providers = [
+            make_cli_provider("codex", args.codex_model, timeout=args.timeout),
+            make_cli_provider("claude", args.claude_model, timeout=args.timeout),
+        ]
+        results = compare_models(
+            task,
+            args.workspace,
+            providers,
+            timeout=args.timeout,
+        )
+        write_json(build_payload(task, results), args.output)
+        print(f"Wrote local CLI comparison results to {args.output}")
+        return 0
+
     if args.command == "chart":
         write_svg(read_json(args.result), args.output)
         print(f"Wrote SVG chart to {args.output}")
         return 0
 
     if args.command == "report":
-        markdown = render_markdown(read_json(args.result))
+        payload = read_json(args.result)
+        markdown = render_public_markdown(payload) if args.public else render_markdown(payload)
         if args.output:
             path = Path(args.output)
             path.parent.mkdir(parents=True, exist_ok=True)

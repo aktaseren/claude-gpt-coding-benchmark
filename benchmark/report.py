@@ -76,6 +76,48 @@ def render_markdown(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def render_public_markdown(payload: dict[str, Any]) -> str:
+    task = payload["task"]
+    results = payload.get("results", [])
+    lines = [
+        f"# Public coding benchmark: {task['title']}",
+        "",
+        f"- Task ID: {task['task_id']}",
+        f"- Created: {payload.get('created_at', 'unknown')}",
+        "",
+        "This summary intentionally excludes prompts, repository snapshots, "
+        "patches, test output, and credentials.",
+        "",
+        "| Provider | Model | Status | Patch applied | Tests passed | Time (s) | Input tokens | Output tokens |",
+        "|---|---|---|---|---|---:|---:|---:|",
+    ]
+    for result in results:
+        lines.append(
+            "| {provider} | {model} | {status} | {patch} | {tests} | {elapsed} | {input} | {output} |".format(
+                provider=result.get("provider", ""),
+                model=result.get("model", ""),
+                status=result.get("status", ""),
+                patch="yes" if result.get("patch_applied") else "no",
+                tests="yes" if result.get("tests_passed") else "no",
+                elapsed=result.get("elapsed_seconds", ""),
+                input=result.get("input_tokens")
+                if result.get("input_tokens") is not None
+                else "n/a",
+                output=result.get("output_tokens")
+                if result.get("output_tokens") is not None
+                else "n/a",
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "Results are evidence for this task only; they are not a universal model ranking.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def write_markdown(payload: dict[str, Any], output: str | Path) -> None:
     path = Path(output)
     path.parent.mkdir(parents=True, exist_ok=True)

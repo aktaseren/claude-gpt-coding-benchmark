@@ -75,6 +75,19 @@ units into an unsupported universal score.
 
 ![GPT-5.6 Luna vs Claude coding benchmark](docs/benchmark-results.svg)
 
+The current public run uses the repository's calculator demo task. Both local
+CLIs passed the same test; the sanitized summary is available in
+[docs/local-cli-comparison.md](docs/local-cli-comparison.md). Raw result JSON,
+prompts, patches, test output, and credentials remain local and ignored.
+
+For local authenticated CLIs, use:
+
+    coding-benchmark compare-local examples/demo_task.json \
+      --workspace /path/to/this/repository \
+      --codex-model gpt-5.6-luna \
+      --claude-model sonnet \
+      --output results/local-cli-demo.json
+
 ## Task manifest
 
 A task is a JSON document:

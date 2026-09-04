@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import json
 import os
+import subprocess
+import tempfile
+from pathlib import Path
 from typing import Any, Protocol
 
 from .models import ModelResponse
@@ -129,6 +133,187 @@ class AnthropicProvider:
         )
 
 
+SECRET_ENV_MARKERS = (
+    "API_KEY",
+    "ACCESS_TOKEN",
+    "AUTH_TOKEN",
+    "SECRET",
+    "PASSWORD",
+    "PRIVATE_KEY",
+)
+
+
+def _is_secret_environment_name(name: str) -> bool:
+    upper_name = name.upper()
+    return (
+        any(marker in upper_name for marker in SECRET_ENV_MARKERS)
+        or upper_name.endswith("_TOKEN")
+        or upper_name in {"GITHUB_TOKEN", "GH_TOKEN"}
+    )
+
+
+def _safe_cli_environment() -> dict[str, str]:
+    return {
+        name: value
+        for name, value in os.environ.items()
+        if not _is_secret_environment_name(name)
+    }
+
+
+def _redact_environment_values(text: str) -> str:
+    redacted = text
+    for name, value in os.environ.items():
+        if value and _is_secret_environment_name(name):
+            redacted = redacted.replace(value, "[REDACTED]")
+    return redacted
+
+
+class CodexCLIProvider:
+    provider = "codex-cli"
+
+    def __init__(
+        self,
+        model: str,
+        command: str = "codex",
+        timeout: int = 600,
+    ) -> None:
+        self.model = model
+        self.command = command
+        self.timeout = timeout
+
+    def generate(self, prompt: str) -> ModelResponse:
+        with tempfile.TemporaryDirectory(prefix="coding-benchmark-codex-") as directory:
+            output_path = Path(directory) / "last-message.txt"
+            command = [
+                self.command,
+                "exec",
+                "--model",
+                self.model,
+                "--sandbox",
+                "read-only",
+                "--ephemeral",
+                "--skip-git-repo-check",
+                "--ignore-user-config",
+                "--color",
+                "never",
+                "--output-last-message",
+                str(output_path),
+                "-",
+            ]
+            completed = _run_local_cli(
+                command,
+                prompt,
+                cwd=directory,
+                timeout=self.timeout,
+            )
+            if output_path.is_file():
+                response_text = output_path.read_text(encoding="utf-8")
+            else:
+                response_text = completed.stdout
+            if not response_text.strip():
+                raise ProviderError("Codex CLI returned no final message")
+            return ModelResponse(text=_redact_environment_values(response_text))
+
+
+class ClaudeCLIProvider:
+    provider = "claude-cli"
+
+    def __init__(
+        self,
+        model: str,
+        command: str = "claude",
+        timeout: int = 600,
+    ) -> None:
+        self.model = model
+        self.command = command
+        self.timeout = timeout
+
+    def generate(self, prompt: str) -> ModelResponse:
+        command = [
+            self.command,
+            "--print",
+            "--model",
+            self.model,
+            "--output-format",
+            "json",
+            "--no-session-persistence",
+            "--safe-mode",
+            "--tools",
+            "",
+            "--permission-mode",
+            "plan",
+        ]
+        with tempfile.TemporaryDirectory(prefix="coding-benchmark-claude-") as directory:
+            completed = _run_local_cli(
+                command,
+                prompt,
+                cwd=directory,
+                timeout=self.timeout,
+            )
+
+        response_text = completed.stdout.strip()
+        input_tokens = None
+        output_tokens = None
+        try:
+            payload = json.loads(response_text)
+        except json.JSONDecodeError:
+            payload = None
+        if isinstance(payload, dict):
+            response_text = str(payload.get("result") or payload.get("text") or "")
+            usage = payload.get("usage") or {}
+            input_tokens = _usage_value(usage, "input_tokens")
+            if input_tokens is None:
+                input_tokens = _usage_value(usage, "inputTokens")
+            output_tokens = _usage_value(usage, "output_tokens")
+            if output_tokens is None:
+                output_tokens = _usage_value(usage, "outputTokens")
+
+        if not response_text.strip():
+            raise ProviderError("Claude CLI returned no final message")
+        return ModelResponse(
+            text=_redact_environment_values(response_text),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+
+
+def _run_local_cli(
+    command: list[str],
+    prompt: str,
+    *,
+    cwd: str,
+    timeout: int,
+) -> subprocess.CompletedProcess[str]:
+    safe_prompt = _redact_environment_values(
+        SYSTEM_INSTRUCTIONS + "\n\n" + prompt
+    )
+    try:
+        completed = subprocess.run(
+            command,
+            cwd=cwd,
+            env=_safe_cli_environment(),
+            input=safe_prompt,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            check=False,
+        )
+    except FileNotFoundError as exc:
+        raise ProviderError(f"Local CLI is not installed: {command[0]}") from exc
+    except subprocess.TimeoutExpired as exc:
+        raise ProviderError(f"Local CLI timed out after {timeout} seconds") from exc
+
+    if completed.returncode != 0:
+        detail = _redact_environment_values(
+            (completed.stderr or completed.stdout or "").strip()
+        )
+        detail = detail[-1000:] if detail else "no diagnostic output"
+        raise ProviderError(
+            f"Local CLI failed with exit code {completed.returncode}: {detail}"
+        )
+    return completed
+
+
 def make_provider(
     provider: str,
     model: str,
@@ -141,3 +326,17 @@ def make_provider(
     if provider == "anthropic":
         return AnthropicProvider(model)
     raise ValueError(f"Unsupported provider: {provider}")
+
+
+def make_cli_provider(
+    provider: str,
+    model: str,
+    *,
+    timeout: int = 600,
+) -> ModelProvider:
+    provider = provider.lower()
+    if provider == "codex":
+        return CodexCLIProvider(model, timeout=timeout)
+    if provider in {"claude", "anthropic"}:
+        return ClaudeCLIProvider(model, timeout=timeout)
+    raise ValueError(f"Unsupported local CLI provider: {provider}")
